@@ -1,0 +1,40 @@
+
+# Load the input image
+image = cv2.imread('C:/Users/Domera.MARION/Desktop/compv/nite.jpg')
+
+# Define the desired width and height for the resized image
+desired_width = 500
+desired_height = 400
+
+# Resize the image
+resized_image = cv2.resize(image, (desired_width, desired_height))
+
+# Convert the image to grayscale for face detection
+gray_resized = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
+
+# Perform face detection
+faces = face_cascade.detectMultiScale(gray_resized, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+
+# Draw bounding boxes around the detected faces and make predictions
+for (x, y, w, h) in faces:
+    # Draw bounding box around the face
+    cv2.rectangle(resized_image, (x, y), (x+w, y+h), (0, 255, 0), 2)
+    
+    # Extract the region of interest (ROI) containing the face
+    face_roi = gray_resized[y:y+h, x:x+w]
+
+    # Preprocess the input image
+    processed_roi = preprocess_input(face_roi)
+
+    # Make predictions
+    predictions = model.predict(processed_roi)
+    emotion_index = np.argmax(predictions)
+    emotion_label = emotion_labels[emotion_index]
+
+    # Display the emotion label on the rectangle
+    cv2.putText(resized_image, emotion_label, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+
+# Display the output image
+cv2.imshow('Output', resized_image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
